@@ -1,0 +1,21 @@
+### macos
+.DS_Store
+
+### Go
+*.test
+vendor/
+/cover.out
+
+### IntelliJ IDEA
+.idea/
+*.iml
+
+### direnv
+.envrc
+
+### Temporary directory
+tmp/
+*.swp
+_tools
+bin/*
+telepresence.log
