@@ -52,6 +52,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 func orderBookBuilding(ctx context.Context) error {
@@ -79,13 +80,13 @@ func orderBookBuilding(ctx context.Context) error {
 	}
 	var companyName string
 	for _, _ = range company {
-		log.Println("order start")
-		err = chromedp.Run(ctx, order(&companyName))
-		log.Println("order", strings.TrimSpace(companyName))
+		log.Println("apply start")
+		err = chromedp.Run(ctx, apply(&companyName))
+		log.Println("apply", strings.TrimSpace(companyName))
 		if err != nil {
-			return fmt.Errorf("failed to order: %v", err)
+			return fmt.Errorf("failed to apply: %v", err)
 		}
-		log.Println("order end")
+		log.Println("apply end")
 	}
 	return nil
 }
@@ -108,19 +109,19 @@ func login() chromedp.Tasks {
 	}
 }
 
-func order(companyName *string) chromedp.Tasks {
-	applicationSel := `//img[@alt="申込"]`
+func apply(companyName *string) chromedp.Tasks {
+	applySel := `//img[@alt="申込"]`
 	suryoSel := `//input[@name="suryo"]`
 	strikePriceSel := `//label[@for="strPriceRadio"]`
 	torihikiPasswordSel := `//input[@name="tr_pass"]`
 	submitOrderSel := `//input[@name="order_kakunin"]`
 	submitOrderConfirmSel := `//input[@name="order_btn"]`
 	return chromedp.Tasks{
-		chromedp.WaitVisible(applicationSel),
-		chromedp.Click(applicationSel),
+		chromedp.WaitVisible(applySel),
+		chromedp.Click(applySel),
 		chromedp.WaitVisible(suryoSel),
 		chromedp.Text(`.lbody`, companyName),
-		chromedp.SendKeys(suryoSel, "1000"),
+		chromedp.SendKeys(suryoSel, "10000"),
 		chromedp.SendKeys(torihikiPasswordSel, torihikiPassword),
 		chromedp.Click(strikePriceSel),
 		chromedp.Click(submitOrderSel),
