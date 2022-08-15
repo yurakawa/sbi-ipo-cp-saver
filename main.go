@@ -18,7 +18,6 @@ var (
 	torihikiPassword string
 )
 
-// memo: actionを別のrunに分けるとcontext cancelが発生しやすく鳴る
 func main() {
 	e, err := config.LoadEnvVariables()
 	if err != nil {
