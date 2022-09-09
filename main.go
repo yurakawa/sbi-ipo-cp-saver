@@ -77,8 +77,8 @@ func orderBookBuilding(ctx context.Context) error {
 		log.Println("unapplied for does not exist.")
 		return nil
 	}
-	var companyName string
-	for _, _ = range company {
+	for i := 0; i < len(company); i++ {
+		var companyName string
 		log.Println("apply start")
 		err = chromedp.Run(ctx, apply(&companyName))
 		log.Println("apply", strings.TrimSpace(companyName))
@@ -115,6 +115,7 @@ func apply(companyName *string) chromedp.Tasks {
 	torihikiPasswordSel := `//input[@name="tr_pass"]`
 	submitOrderSel := `//input[@name="order_kakunin"]`
 	submitOrderConfirmSel := `//input[@name="order_btn"]`
+	backSel := `//a[@href="/oeliw011?type=21"]`
 	return chromedp.Tasks{
 		chromedp.WaitVisible(applySel),
 		chromedp.Click(applySel),
@@ -126,7 +127,9 @@ func apply(companyName *string) chromedp.Tasks {
 		chromedp.Click(submitOrderSel),
 		chromedp.WaitVisible(submitOrderConfirmSel),
 		chromedp.Click(submitOrderConfirmSel),
-		chromedp.Sleep(time.Second),
+		chromedp.WaitVisible(backSel),
+		chromedp.Click(backSel),
+		chromedp.Sleep(2 * time.Second),
 	}
 
 }
