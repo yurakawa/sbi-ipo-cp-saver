@@ -28,9 +28,7 @@ func main() {
 	password = e.SbiPassword
 	torihikiPassword = e.SbiTorihikiPassword
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	allocCtx, cancel := chromedp.NewExecAllocator(ctx, append(chromedp.DefaultExecAllocatorOptions[:],
+	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.DisableGPU,
 		// chromedp.Flag("headless", false),
 	)...)
@@ -46,8 +44,10 @@ func main() {
 		}(),
 	)
 	defer cancel()
+	ctx, cancel := context.WithTimeout(taskCtx, 15*time.Second)
+	defer cancel()
 
-	err = orderBookBuilding(taskCtx)
+	err = orderBookBuilding(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
