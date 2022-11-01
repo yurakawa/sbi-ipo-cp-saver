@@ -44,7 +44,7 @@ func main() {
 		}(),
 	)
 	defer cancel()
-	ctx, cancel := context.WithTimeout(taskCtx, 15*time.Second)
+	ctx, cancel := context.WithTimeout(taskCtx, 30*time.Second)
 	defer cancel()
 
 	err = orderBookBuilding(ctx)
@@ -111,25 +111,31 @@ func login() chromedp.Tasks {
 func apply(companyName *string) chromedp.Tasks {
 	applySel := `//img[@alt="申込"]`
 	suryoSel := `//input[@name="suryo"]`
-	strikePriceSel := `//label[@for="strPriceRadio"]`
 	torihikiPasswordSel := `//input[@name="tr_pass"]`
 	submitOrderSel := `//input[@name="order_kakunin"]`
+	// submitOrderConfirmSel := `//input[@type="submit"]`
 	submitOrderConfirmSel := `//input[@name="order_btn"]`
 	backSel := `//a[@href="/oeliw011?type=21"]`
+	urlStr := "https://m.sbisec.co.jp/oeliw011?type=21"
+
 	return chromedp.Tasks{
 		chromedp.WaitVisible(applySel),
 		chromedp.Click(applySel),
-		chromedp.WaitVisible(suryoSel),
+		chromedp.WaitVisible(submitOrderSel),
 		chromedp.Text(`.lbody`, companyName),
 		chromedp.SendKeys(suryoSel, "10000"),
+		chromedp.Click(`//label[@for="strPriceRadio"]`),
 		chromedp.SendKeys(torihikiPasswordSel, torihikiPassword),
-		chromedp.Click(strikePriceSel),
+		chromedp.Sleep(2 * time.Second),
 		chromedp.Click(submitOrderSel),
-		chromedp.WaitVisible(submitOrderConfirmSel),
+		chromedp.Sleep(2 * time.Second),
 		chromedp.Click(submitOrderConfirmSel),
 		chromedp.WaitVisible(backSel),
-		chromedp.Click(backSel),
-		chromedp.Sleep(2 * time.Second),
-	}
+		// chromedp.Click(backSel),
+		chromedp.Navigate(urlStr),
 
+		chromedp.Sleep(time.Second),
+	}
 }
+
+// $x('//input[@name="order_btn"]')のようにcdpのconsoleで確認する
