@@ -126,7 +126,7 @@ func apply(companyName *string) chromedp.Tasks {
 		chromedp.SendKeys(suryoSel, "10000"),
 		chromedp.Click(`//label[@for="strPriceRadio"]`),
 		chromedp.SendKeys(torihikiPasswordSel, torihikiPassword),
-		chromedp.Sleep(1 * time.Second),
+		chromedp.WaitVisible(submitOrderSel),
 		chromedp.Click(submitOrderSel),
 		chromedp.Sleep(1 * time.Second),
 		chromedp.Click(submitOrderConfirmSel),
