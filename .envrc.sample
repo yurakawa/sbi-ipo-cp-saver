@@ -1,4 +1,4 @@
 export SBI_USERNAME=<Your login username>
 export SBI_PASSWORD=<Your login password>
 export SBI_TORIHIKI_PASSWORD=<Your torihiki password>
-export LOG_LEVEL=DEBUG
+# export LOG_LEVEL=DEBUG

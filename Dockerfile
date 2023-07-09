@@ -1,14 +1,11 @@
-FROM golang:1.20.2-alpine AS builder
+FROM golang:latest as build
 
 WORKDIR /go/src/github.com/yurakawa/sbi-ipo-cp-saver
 ADD . /go/src/github.com/yurakawa/sbi-ipo-cp-saver
 
 RUN go mod download
-RUN go build -v -o main
+RUN CGO_ENABLED=0 go build -v -o main .
 
-
-FROM alpine:latest
-
-COPY --from=builder /go/src/github.com/yurakawa/sbi-ipo-cp-saver/main /bin/main
-
-CMD ["/bin/main", "--help"]
+FROM chromedp/headless-shell:latest
+COPY --from=build /go/src/github.com/yurakawa/sbi-ipo-cp-saver/main /
+CMD ["/main"]
