@@ -91,10 +91,10 @@ func orderBookBuilding(ctx context.Context) error {
 }
 
 func login() chromedp.Tasks {
-	urlStr := `https://site2.sbisec.co.jp/ETGate/`
+	urlStr := `https://site1.sbisec.co.jp/ETGate/?_ControlID=WPLETlgR001Control&_PageID=WPLETlgR001Rlgn50&_DataStoreID=DSWPLETlgR001Control&_ActionID=login&getFlg=on`
 	usernameSel := `//input[@name="user_id"]`
 	passwordSel := `//input[@name="user_password"]`
-	loginSel := `//input[@name="ACT_login"]`
+	loginSel := `//input[@name="logon"]`
 
 	return chromedp.Tasks{
 		chromedp.Navigate(urlStr),
