@@ -30,7 +30,7 @@ func main() {
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.DisableGPU,
-		// chromedp.Flag("headless", false),
+		chromedp.Flag("headless", e.Headless),
 	)...)
 	defer cancel()
 

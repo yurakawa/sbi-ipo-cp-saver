@@ -10,7 +10,8 @@ type EnvVariables struct {
 	SbiUserName         string `envconfig:"SBI_USERNAME"`
 	SbiPassword         string `envconfig:"SBI_PASSWORD"`
 	SbiTorihikiPassword string `envconfig:"SBI_TORIHIKI_PASSWORD"`
-	LogLevel            string `envconfig:"LOG_LEVEL" default:"INFO"`
+	LogLevel            string `envconfig:"LOG_LEVEL" default:"INFO"` // INFO or DEBUG
+	Headless            bool   `envconfig:"HEADLESS" default:"true"`
 }
 
 func LoadEnvVariables() (*EnvVariables, error) {
