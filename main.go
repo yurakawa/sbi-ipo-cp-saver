@@ -28,13 +28,17 @@ func main() {
 	password = e.SbiPassword
 	torihikiPassword = e.SbiTorihikiPassword
 
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.DisableGPU,
-		chromedp.Flag("headless", e.Headless),
-	)...)
+	allocCtx, cancel := chromedp.NewExecAllocator(
+		context.Background(), append(
+			chromedp.DefaultExecAllocatorOptions[:],
+			chromedp.DisableGPU,
+			chromedp.Flag("headless", e.Headless),
+		)...,
+	)
 	defer cancel()
 
-	taskCtx, cancel := chromedp.NewContext(allocCtx,
+	taskCtx, cancel := chromedp.NewContext(
+		allocCtx,
 		func() chromedp.ContextOption {
 			co := chromedp.WithLogf(log.Printf)
 			if e.LogLevel == "DEBUG" {
@@ -65,7 +69,10 @@ func orderBookBuilding(ctx context.Context) error {
 	if err = chromedp.Run(ctx, chromedp.Navigate("https://m.sbisec.co.jp/oeliw011?type=21")); err != nil {
 		return err
 	}
-	if err = chromedp.Run(ctx, chromedp.WaitVisible(`//h2[contains(text(),"新規上場株式ブックビルディング")]`)); err != nil {
+	if err = chromedp.Run(
+		ctx,
+		chromedp.WaitVisible(`//h2[contains(text(),"新規上場株式ブックビルディング")]`),
+	); err != nil {
 		return err
 	}
 
@@ -94,7 +101,7 @@ func login() chromedp.Tasks {
 	urlStr := `https://site1.sbisec.co.jp/ETGate/?_ControlID=WPLETlgR001Control&_PageID=WPLETlgR001Rlgn50&_DataStoreID=DSWPLETlgR001Control&_ActionID=login&getFlg=on`
 	usernameSel := `//input[@name="user_id"]`
 	passwordSel := `//input[@name="user_password"]`
-	loginSel := `//input[@name="logon"]`
+	loginSel := `//button[@name="ACT_loginHome"]`
 
 	return chromedp.Tasks{
 		chromedp.Navigate(urlStr),
