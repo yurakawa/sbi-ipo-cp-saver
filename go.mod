@@ -3,7 +3,7 @@ module github.com/yurakawa/sbi-ipo-cp-miner
 go 1.20
 
 require (
-	github.com/chromedp/cdproto v0.0.0-20240519224452-66462be74baa
+	github.com/chromedp/cdproto v0.0.0-20240810084448-b931b754e476
 	github.com/chromedp/chromedp v0.9.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pkg/errors v0.9.1
