@@ -15,19 +15,40 @@ help:
 go_module: ## Run go mod tidy
 	go mod tidy
 
+
+.PHONY: init_and_schedule
+init_and_schedule:
+	configure \
+	build \
+	push \
+	deploy \
+	create_schedule
+
+.PHONY: configure
+configure:
+	gcloud auth configure-docker $(REGION)-docker.pkg.dev
+	gcloud artifacts repositories create $(PROJECT_NAME) \
+	      --repository-format=docker \
+	      --location=$(REGION) \
+	      --description="$(PROJECT_NAME)"  \
+	      --immutable-tags \
+	      --async
+
+
 .PHONY: build
 build: ## Build with buildpacks
-	docker build --no-cache --platform amd64 -t $(PROJECT_NAME) -f Dockerfile  .
-	docker tag $(PROJECT_NAME) asia.gcr.io/$(GCP_PROJECT)/$(PROJECT_NAME)
+	docker build --no-cache -t $(PROJECT_NAME) -f Dockerfile  .
+	docker tag $(PROJECT_NAME) $(REGION)-docker.pkg.dev/$(GCP_PROJECT)/$(PROJECT_NAME)/$(PROJECT_NAME)
 
 .PHONY: push
-push: ## Push container image to GCR (Google Cloud Registry)
-	docker push asia.gcr.io/$(GCP_PROJECT)/$(PROJECT_NAME)
+push: ## Push container image to Artifact Registry
+	# docker push asia.gcr.io/$(GCP_PROJECT)/$(PROJECT_NAME)
+	docker push $(REGION)-docker.pkg.dev/$(GCP_PROJECT)/$(PROJECT_NAME)/$(PROJECT_NAME)
 
 .PHONY: deploy
 deploy: ## Deploy to Google Cloud Run
 	gcloud beta run jobs deploy $(JOB_NAME) \
-	--image asia.gcr.io/$(GCP_PROJECT)/$(PROJECT_NAME):latest \
+	--image $(REGION)-docker.pkg.dev/$(GCP_PROJECT)/$(PROJECT_NAME)/$(PROJECT_NAME):latest \
 	--command '/main' \
 	--region $(REGION) \
 	--set-env-vars "SBI_USERNAME=$(SBI_USERNAME)" \
