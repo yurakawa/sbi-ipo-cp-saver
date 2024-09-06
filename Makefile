@@ -16,9 +16,8 @@ go_module: ## Run go mod tidy
 	go mod tidy
 
 
-.PHONY: init_and_schedule
-init_and_schedule:
-	configure \
+.PHONY: configure_and_schedule
+configure_and_schedule: configure \
 	build \
 	push \
 	deploy \
@@ -27,23 +26,21 @@ init_and_schedule:
 .PHONY: configure
 configure:
 	gcloud auth configure-docker $(REGION)-docker.pkg.dev
-	gcloud artifacts repositories create $(PROJECT_NAME) \
+	-@gcloud artifacts repositories create $(PROJECT_NAME) \
 	      --repository-format=docker \
 	      --location=$(REGION) \
 	      --description="$(PROJECT_NAME)"  \
-	      --immutable-tags \
 	      --async
 
 
 .PHONY: build
 build: ## Build with buildpacks
-	docker build --no-cache -t $(PROJECT_NAME) -f Dockerfile  .
+	docker build --platform linux/amd64 --no-cache -t $(PROJECT_NAME) -f Dockerfile  .
 	docker tag $(PROJECT_NAME) $(REGION)-docker.pkg.dev/$(GCP_PROJECT)/$(PROJECT_NAME)/$(PROJECT_NAME)
 
 .PHONY: push
 push: ## Push container image to Artifact Registry
-	# docker push asia.gcr.io/$(GCP_PROJECT)/$(PROJECT_NAME)
-	docker push $(REGION)-docker.pkg.dev/$(GCP_PROJECT)/$(PROJECT_NAME)/$(PROJECT_NAME)
+	docker push $(REGION)-docker.pkg.dev/$(GCP_PROJECT)/$(PROJECT_NAME)/$(PROJECT_NAME):latest
 
 .PHONY: deploy
 deploy: ## Deploy to Google Cloud Run
@@ -51,6 +48,7 @@ deploy: ## Deploy to Google Cloud Run
 	--image $(REGION)-docker.pkg.dev/$(GCP_PROJECT)/$(PROJECT_NAME)/$(PROJECT_NAME):latest \
 	--command '/main' \
 	--region $(REGION) \
+	--memory 1Gi \
 	--set-env-vars "SBI_USERNAME=$(SBI_USERNAME)" \
 	--set-env-vars "SBI_PASSWORD=$(SBI_PASSWORD)" \
 	--set-env-vars "SBI_TORIHIKI_PASSWORD=$(SBI_TORIHIKI_PASSWORD)"

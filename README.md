@@ -7,5 +7,5 @@ Set 3 environment variables (`SBI_USERNAME`, `SBI_PASSWORD`, `SBI_TORIHIKI_PASSW
 
 # Run on CloudRun Job
 ```
-make init_and_schedule
+make configur_and_schedule
 ```
