@@ -1,5 +1,9 @@
+# export LOG_LEVEL=DEBUG
+# export HEADLESS=false
+
+# export GCP_PROJECT_ID=<Your GCP project ID>
+# export REGION=<Your region>
+
 export SBI_USERNAME=<Your login username>
 export SBI_PASSWORD=<Your login password>
 export SBI_TORIHIKI_PASSWORD=<Your torihiki password>
-# export LOG_LEVEL=DEBUG
-# export HEADLESS=false

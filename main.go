@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
+	"os"
 	"strings"
 	"time"
 
@@ -18,16 +19,34 @@ var (
 	torihikiPassword string
 )
 
+const (
+	exitOK = iota
+	exitError
+)
+
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
+	// logger := slog.New(
+	// 	slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+	// 		AddSource: true,
+	// 	}),
+	// )
+	// slog.SetDefault(logger)
+
+	slog.Info("Starting the application...")
 	e, err := config.LoadEnvVariables()
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Error loading environment variables", "err", err)
+		return exitError
 	}
-
+	slog.Info("Loaded environment variables")
 	userName = e.SbiUserName
 	password = e.SbiPassword
 	torihikiPassword = e.SbiTorihikiPassword
-
+	slog.Info("Set user credentials")
 	allocCtx, cancel := chromedp.NewExecAllocator(
 		context.Background(), append(
 			chromedp.DefaultExecAllocatorOptions[:],
@@ -36,13 +55,13 @@ func main() {
 		)...,
 	)
 	defer cancel()
-
+	slog.Info("Created ChromeDP allocator context")
 	taskCtx, cancel := chromedp.NewContext(
 		allocCtx,
 		func() chromedp.ContextOption {
-			co := chromedp.WithLogf(log.Printf)
+			co := chromedp.WithLogf(slog.Info)
 			if e.LogLevel == "DEBUG" {
-				co = chromedp.WithDebugf(log.Printf)
+				co = chromedp.WithDebugf(slog.Debug)
 			}
 			return co
 		}(),
@@ -53,46 +72,45 @@ func main() {
 
 	err = orderBookBuilding(ctx)
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Error in orderBookBuilding", "err", err)
+		return exitError
 	}
-
+	return exitOK
 }
 
 func orderBookBuilding(ctx context.Context) error {
-	log.Println("login start")
-	err := chromedp.Run(ctx, login())
-	if err != nil {
+	slog.Info("login start")
+	if err := chromedp.Run(ctx, login()); err != nil {
 		return fmt.Errorf("failed to login: %v", err)
 	}
-	log.Println("login end")
+	slog.Info("success to login")
 
-	if err = chromedp.Run(ctx, chromedp.Navigate("https://m.sbisec.co.jp/oeliw011?type=21")); err != nil {
-		return err
-	}
-	if err = chromedp.Run(
-		ctx,
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate("https://m.sbisec.co.jp/oeliw011?type=21"),
 		chromedp.WaitVisible(`//h2[contains(text(),"新規上場株式ブックビルディング")]`),
 	); err != nil {
 		return err
 	}
+	slog.Info("moved to order book building page")
 
 	var company []*cdp.Node
-	if err = chromedp.Run(ctx, chromedp.Nodes(`//img[@alt="申込"]`, &company, chromedp.AtLeast(0))); err != nil {
+	if err := chromedp.Run(ctx, chromedp.Nodes(`//img[@alt="申込"]`, &company, chromedp.AtLeast(0))); err != nil {
 		return err
 	}
 	if len(company) == 0 {
-		log.Println("unapplied for does not exist.")
+		slog.Info("unapplied for does not exist.")
 		return nil
 	}
-	for i := 0; i < len(company); i++ {
+	// for i := 0; i < len(company); i++ {
+	for _ = range company {
 		var companyName string
-		log.Println("apply start")
-		err = chromedp.Run(ctx, apply(&companyName))
-		log.Println("apply", strings.TrimSpace(companyName))
+		slog.Info("apply start")
+		err := chromedp.Run(ctx, apply(&companyName))
+		slog.Info("apply", "company", strings.TrimSpace(companyName))
 		if err != nil {
 			return fmt.Errorf("failed to apply: %v", err)
 		}
-		log.Println("apply end")
+		slog.Info("success to apply")
 	}
 	return nil
 }
@@ -120,7 +138,6 @@ func apply(companyName *string) chromedp.Tasks {
 	suryoSel := `//input[@name="suryo"]`
 	torihikiPasswordSel := `//input[@name="tr_pass"]`
 	submitOrderSel := `//input[@name="order_kakunin"]`
-	// submitOrderConfirmSel := `//input[@type="submit"]`
 	submitOrderConfirmSel := `//input[@name="order_btn"]`
 	backSel := `//a[@href="/oeliw011?type=21"]`
 	urlStr := "https://m.sbisec.co.jp/oeliw011?type=21"
