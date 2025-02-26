@@ -40,6 +40,9 @@ sbi-ipo-cp-saverは、SBI証券のIPOに自動で応募し、チャレンジポ�
 #### 初回
 
 1. 以下の環境変数を設定します。
+   - `SBI_USERNAME`
+   - `SBI_PASSWORD`
+   - `SBI_TORIHIKI_PASSWORD`
    - `GCP_PROJECT_ID`
    - `REGION`
 
