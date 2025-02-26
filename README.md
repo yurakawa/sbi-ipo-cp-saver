@@ -37,7 +37,7 @@ sbi-ipo-cp-saverは、SBI証券のIPOに自動で応募し、チャレンジポ�
 
 ### CloudRunでの実行
 
-#### 初回
+#### 初期設定
 
 1. 以下の環境変数を設定します。
    - `SBI_USERNAME`
@@ -52,21 +52,9 @@ sbi-ipo-cp-saverは、SBI証券のIPOに自動で応募し、チャレンジポ�
    make initializing
    ```
 
-3. CloudRunでジョブを実行します。
-
-   ```bash
-   make exec
-   ```
-
 #### 初回以降
-1. イメージやパスワードを更新する際に使用します。
+1. イメージやパスワードの更新を反映したい場合
 
    ```bash
    make update
-   ```
-
-2. CloudRunでジョブを実行します。
-
-   ```bash
-   make exec
    ```
